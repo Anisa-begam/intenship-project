@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Grade Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+
+        .student-form {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border: 2px solid #e9ecef;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 600;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .marks-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .mark-input {
+            flex: 1;
+            min-width: 100px;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-add {
+            background: #28a745;
+            color: white;
+            margin-top: 15px;
+        }
+
+        .btn-add:hover {
+            background: #218838;
+        }
+
+        .btn-calculate {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            margin-top: 20px;
+        }
+
+        .btn-calculate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .results {
+            margin-top: 30px;
+            display: none;
+        }
+
+        .results.show {
+            display: block;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .grade {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .grade-A { background: #d4edda; color: #155724; }
+        .grade-B { background: #cce5ff; color: #004085; }
+        .grade-C { background: #fff3cd; color: #856404; }
+        .grade-D { background: #f8d7da; color: #721c24; }
+        .grade-E { background: #e2e3e5; color: #383d41; }
+        .grade-F { background: #f5c6cb; color: #721c24; }
+
+        .student-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .student-header h3 {
+            color: #333;
+            margin: 0;
+        }
+
+        .no-students {
+            text-align: center;
+            color: #6c757d;
+            padding: 40px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎓 Student Grade Calculator</h1>
+        
+        <div id="students-container"></div>
+        
+        <button class="btn-add" onclick="addStudent()">+ Add Student</button>
+        <button class="btn-calculate" onclick="calculateGrades()">Calculate Grades</button>
+        
+        <div class="results" id="results">
+            <h2>📊 Results</h2>
+            <table id="results-table">
+                <thead>
+                    <tr>
+                        <th>Student Name</th>
+                        <th>Average</th>
+                        <th>Grade</th>
+                    </tr>
+                </thead>
+                <tbody id="results-body"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let studentCount = 0;
+
+        function addStudent() {
+            studentCount++;
+            const container = document.getElementById('students-container');
+            
+            const studentDiv = document.createElement('div');
+            studentDiv.className = 'student-form';
+            studentDiv.id = `student-${studentCount}`;
+            
+            studentDiv.innerHTML = `
+                <div class="student-header">
+                    <h3>Student ${studentCount}</h3>
+                    <button class="btn-danger" onclick="removeStudent(${studentCount})">Remove</button>
+                </div>
+                <div class="form-group">
+                    <label>Student Name:</label>
+                    <input type="text" class="student-name" placeholder="Enter student name">
+                </div>
+                <div class="form-group">
+                    <label>Marks (separate by comma):</label>
+                    <input type="text" class="student-marks" placeholder="e.g., 85, 90, 78, 92">
+                </div>
+            `;
+            
+            container.appendChild(studentDiv);
+        }
+
+        function removeStudent(id) {
+            const studentDiv = document.getElementById(`student-${id}`);
+            if (studentDiv) {
+                studentDiv.remove();
+            }
+        }
+
+        function calculateGrades() {
+            const students = [];
+            const studentForms = document.querySelectorAll('.student-form');
+            
+            studentForms.forEach(form => {
+                const name = form.querySelector('.student-name').value;
+                const marksStr = form.querySelector('.student-marks').value;
+                
+                if (name && marksStr) {
+                    const marks = marksStr.split(',').map(m => parseFloat(m.trim())).filter(m => !isNaN(m));
+                    students.push({ name, marks });
+                }
+            });
+
+            if (students.length === 0) {
+                alert('Please add at least one student with name and marks.');
+                return;
+            }
+
+            fetch('/calculate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ students })
+            })
+            .then(response => response.json())
+            .then(data => {
+                displayResults(data.results);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while calculating grades.');
+            });
+        }
+
+        function displayResults(results) {
+            const resultsDiv = document.getElementById('results');
+            const resultsBody = document.getElementById('results-body');
+            
+            resultsBody.innerHTML = '';
+            
+            results.forEach(result => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${result.name}</td>
+                    <td>${result.average}</td>
+                    <td><span class="grade grade-${result.grade}">${result.grade}</span></td>
+                `;
+                resultsBody.appendChild(row);
+            });
+            
+            resultsDiv.classList.add('show');
+        }
+
+        // Add first student by default
+        addStudent();
+    </script>
+</body>
+</html>
