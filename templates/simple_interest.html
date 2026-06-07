@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Interest Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .result.show {
+            display: block;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-label {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .result-value {
+            font-weight: bold;
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💰 Simple Interest Calculator</h1>
+        
+        <div class="form-group">
+            <label for="principal">Principal Amount:</label>
+            <input type="number" id="principal" placeholder="Enter principal amount" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="rate">Rate of Interest (%):</label>
+            <input type="number" id="rate" placeholder="Enter rate of interest" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="time">Time (years):</label>
+            <input type="number" id="time" placeholder="Enter time in years" required>
+        </div>
+        
+        <button onclick="calculateInterest()">Calculate Interest</button>
+        
+        <div class="result" id="result">
+            <div class="result-item">
+                <span class="result-label">Simple Interest:</span>
+                <span class="result-value" id="interest-value"></span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Total Amount:</span>
+                <span class="result-value" id="total-value"></span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function calculateInterest() {
+            const principal = parseFloat(document.getElementById('principal').value);
+            const rate = parseFloat(document.getElementById('rate').value);
+            const time = parseFloat(document.getElementById('time').value);
+
+            if (isNaN(principal) || isNaN(rate) || isNaN(time)) {
+                alert('Please enter valid numbers for all fields.');
+                return;
+            }
+
+            fetch('/simple-interest-calculator', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ principal, rate, time })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('interest-value').textContent = data.simple_interest.toFixed(2);
+                document.getElementById('total-value').textContent = data.total_amount.toFixed(2);
+                document.getElementById('result').classList.add('show');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while calculating interest.');
+            });
+        }
+    </script>
+</body>
+</html>

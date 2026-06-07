@@ -1,4 +1,4 @@
-def calculate_student_grades(students):
+ defcalculate_student_grades(students):
     results = []
 
     for student in students:
