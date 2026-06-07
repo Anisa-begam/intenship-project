@@ -261,7 +261,7 @@
                 return;
             }
 
-            fetch('/calculate', {
+            fetch('/calculate-grades', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -270,7 +270,7 @@
             })
             .then(response => response.json())
             .then(data => {
-                displayResults(data.results);
+                displayResults(data);
             })
             .catch(error => {
                 console.error('Error:', error);

@@ -1,50 +1,48 @@
 from flask import Flask, render_template, request, jsonify
-import os
 
 app = Flask(__name__)
 
-def calculate_grade(average):
-    if average >= 90:
-        return 'A'
-    elif average >= 80:
-        return 'B'
-    elif average >= 70:
-        return 'C'
-    elif average >= 60:
-        return 'D'
-    elif average >= 50:
-        return 'E'
-    else:
-        return 'F'
-
-@app.route('/')
-def index():
-    return render_template('index.html')
-
-@app.route('/calculate', methods=['POST'])
-def calculate():
-    data = request.json
-    students = data.get('students', [])
-    
+def calculate_student_grades(students):
     results = []
+
     for student in students:
-        name = student.get('name', '')
-        marks = student.get('marks', [])
-        
-        if marks:
-            average = sum(marks) / len(marks)
-            grade = calculate_grade(average)
+        average = sum(student["marks"]) / len(student["marks"])
+
+        if average >= 95:
+            grade = "A+"
+        elif average >= 90:
+            grade = "A"
+        elif average >= 75:
+            grade = "B"
+        elif average >= 60:
+            grade = "C"
         else:
-            average = 0
-            grade = 'N/A'
-        
+            grade = "D"
+
         results.append({
-            "name": name,
+            "name": student["name"],
             "average": round(average, 2),
             "grade": grade
         })
-    
-    return jsonify({"results": results})
 
-if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    return results
+
+@app.route("/")
+def index():
+    return render_template("my_ui.html")
+
+@app.route("/my-ui")
+def my_ui():
+    return render_template("my_ui.html")
+
+@app.route("/calculate-grades", methods=["POST"])
+def calculate_grades():
+    data = request.get_json()
+    students = data["students"]
+
+    result = calculate_student_grades(students)
+
+    return jsonify(result)
+
+if __name__ == "__main__":
+    app.run(debug=True)

@@ -1,4 +1,21 @@
+def calculate_student_grades(students):
+    results = []
 
+    for student in students:
+        name = student["name"]
+        marks = student["marks"]
+
+        average = sum(marks) / len(marks)
+
+        if average >= 95:
+            grade = "A+"
+        elif average >= 90:
+            grade = "A"
+        elif average >= 75:
+            grade = "B"
+        elif average >= 60:
+            grade = "C"
+        else:
             grade = "D"
 
         results.append({
@@ -37,26 +54,9 @@ results = calculate_student_grades(students)
 
 # Display results
 print("\n----- STUDENT GRADE REPORT -----")
- "A+"
-        elif average >= 90:
-            grade = "A"
-        elif average >= 75:
-            grade = "B"
-        elif average >= 60:
-            grade = "C"
-        else:
+
 for student in results:
     print(f"Name    : {student['name']}")
     print(f"Average : {student['average']}")
     print(f"Grade   : {student['grade']}")
-    print("-" * 30)def calculate_student_grades(students):
-    results = []
-
-    for student in students:
-        name = student["name"]
-        marks = student["marks"]
-
-        average = sum(marks) / len(marks)
-
-        if average >= 95:
-            grade =
+    print("-" * 30)
