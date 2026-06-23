@@ -1,0 +1,148 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}Faculty - Admin{% endblock %}
+
+{% block sidebar_items %}
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('admin.dashboard') }}">
+        <i class="bi bi-speedometer2 me-2"></i>Dashboard
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('admin.students') }}">
+        <i class="bi bi-people me-2"></i>Students
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link active" href="{{ url_for('admin.faculty') }}">
+        <i class="bi bi-person-workspace me-2"></i>Faculty
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('admin.parents') }}">
+        <i class="bi bi-person-hearts me-2"></i>Parents
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('admin.classes') }}">
+        <i class="bi bi-building me-2"></i>Classes
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('admin.subjects') }}">
+        <i class="bi bi-book me-2"></i>Subjects
+    </a>
+</li>
+{% endblock %}
+
+{% block page_title %}Faculty Management{% endblock %}
+
+{% block content %}
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-white border-0 py-3">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <h6 class="mb-0 fw-bold">All Faculty</h6>
+            <div class="d-flex gap-2">
+                <button class="btn btn-primary btn-sm">
+                    <i class="bi bi-plus-lg me-1"></i>Add Faculty
+                </button>
+                <a href="{{ url_for('admin.export_data', data_type='faculty') }}" class="btn btn-success btn-sm">
+                    <i class="bi bi-download me-1"></i>Export
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <!-- Search and Filter -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-8">
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input type="text" id="searchInput" class="form-control border-start-0" placeholder="Search by name, employee ID, or department...">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <button id="resetFilters" class="btn btn-outline-secondary w-100">
+                    <i class="bi bi-x-circle me-1"></i>Reset Filters
+                </button>
+            </div>
+        </div>
+        
+        <div class="table-responsive">
+            <table class="table table-hover" id="facultyTable">
+                <thead>
+                    <tr>
+                        <th>Employee ID</th>
+                        <th>Name</th>
+                        <th>Username</th>
+                        <th>Department</th>
+                        <th>Qualification</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for faculty in faculty_list %}
+                    <tr data-name="{{ faculty.user.full_name|lower }}" data-employee="{{ faculty.employee_id|lower }}" data-department="{{ faculty.department|lower if faculty.department else '' }}">
+                        <td><span class="badge bg-success">{{ faculty.employee_id }}</span></td>
+                        <td>{{ faculty.user.full_name }}</td>
+                        <td>{{ faculty.user.username }}</td>
+                        <td>{{ faculty.department or '-' }}</td>
+                        <td>{{ faculty.qualification or '-' }}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary me-1">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted">No faculty found</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Search Functionality
+const searchInput = document.getElementById('searchInput');
+const resetFilters = document.getElementById('resetFilters');
+const tableRows = document.querySelectorAll('#facultyTable tbody tr');
+
+function filterTable() {
+    const searchTerm = searchInput.value.toLowerCase();
+    
+    tableRows.forEach(row => {
+        if (row.cells.length === 1) return; // Skip "No faculty found" row
+        
+        const name = row.dataset.name;
+        const employee = row.dataset.employee;
+        const department = row.dataset.department;
+        
+        const matchesSearch = name.includes(searchTerm) || employee.includes(searchTerm) || department.includes(searchTerm);
+        
+        if (matchesSearch) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+
+searchInput.addEventListener('input', filterTable);
+
+resetFilters.addEventListener('click', function() {
+    searchInput.value = '';
+    filterTable();
+});
+</script>
+{% endblock %}

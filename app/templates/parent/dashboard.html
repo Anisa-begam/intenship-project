@@ -1,0 +1,216 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}Parent Dashboard{% endblock %}
+
+{% block sidebar_items %}
+<li class="nav-item">
+    <a class="nav-link active" href="{{ url_for('parent.dashboard') }}">
+        <i class="bi bi-speedometer2 me-2"></i>Dashboard
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('parent.profile') }}">
+        <i class="bi bi-person me-2"></i>Profile
+    </a>
+</li>
+{% endblock %}
+
+{% block page_title %}Parent Dashboard{% endblock %}
+
+{% block content %}
+{% if student %}
+<!-- Child Information Card -->
+<div class="card border-0 shadow-sm mb-4 bg-primary text-white">
+    <div class="card-body py-4">
+        <div class="d-flex align-items-center">
+            <div class="bg-white bg-opacity-25 rounded-circle d-flex align-items-center justify-content-center me-4" style="width: 80px; height: 80px;">
+                <i class="bi bi-person-fill fs-2"></i>
+            </div>
+            <div>
+                <h4 class="mb-1">{{ student.user.full_name }}</h4>
+                <p class="mb-0 opacity-75">{{ class_info.name }} | Roll No: {{ student.roll_number }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Learning Health Status -->
+<div class="row g-4 mb-4">
+    <div class="col-xl-3 col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="bg-primary bg-opacity-10 rounded p-3 me-3">
+                        <i class="bi bi-percent text-primary fs-3"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-1">Overall Progress</h6>
+                        <h3 class="mb-0 fw-bold">{{ overall_progress }}%</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="bg-success bg-opacity-10 rounded p-3 me-3">
+                        <i class="bi bi-emoji-smile text-success fs-3"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-1">Confidence Score</h6>
+                        <h3 class="mb-0 fw-bold">{{ confidence_score }}%</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="bg-success bg-opacity-10 rounded p-3 me-3">
+                        <i class="bi bi-check-circle text-success fs-3"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-1">High Confidence</h6>
+                        <h3 class="mb-0 fw-bold">{{ high_confidence }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="bg-danger bg-opacity-10 rounded p-3 me-3">
+                        <i class="bi bi-exclamation-triangle text-danger fs-3"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-1">Low Confidence</h6>
+                        <h3 class="mb-0 fw-bold">{{ low_confidence }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Subject-wise Progress -->
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0 py-3">
+                <h6 class="mb-0 fw-bold">Subject-wise Progress</h6>
+            </div>
+            <div class="card-body">
+                {% if progress_data %}
+                <div class="row g-4">
+                    {% for name, completion in progress_data %}
+                    <div class="col-md-6">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="fw-bold">{{ name }}</span>
+                            <span class="text-muted">{{ completion|round(1) }}%</span>
+                        </div>
+                        <div class="progress" style="height: 25px;">
+                            <div class="progress-bar bg-primary" role="progressbar" style="width: {{ completion }}%;" aria-valuenow="{{ completion }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted text-center mb-0">No progress data available yet</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Faculty Remarks and Revision Requests -->
+<div class="row g-4">
+    <div class="col-xl-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0 py-3">
+                <h6 class="mb-0 fw-bold">Faculty Remarks</h6>
+            </div>
+            <div class="card-body">
+                {% if faculty_logs %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Subject</th>
+                                <th>Topic</th>
+                                <th>Remarks</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in faculty_logs %}
+                            <tr>
+                                <td>{{ log.date.strftime('%Y-%m-%d') }}</td>
+                                <td>{{ log.subject.name }}</td>
+                                <td><small>{{ log.topic }}</small></td>
+                                <td><small>{{ log.remarks or '-' }}</small></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted text-center mb-0">No faculty remarks yet</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0 py-3">
+                <h6 class="mb-0 fw-bold">Revision Recommendations</h6>
+            </div>
+            <div class="card-body">
+                {% if revision_requests %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Subject</th>
+                                <th>Topic</th>
+                                <th>Comment</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for request in revision_requests %}
+                            <tr>
+                                <td>{{ request.date.strftime('%Y-%m-%d') }}</td>
+                                <td>{{ request.subject.name }}</td>
+                                <td>{{ request.topic }}</td>
+                                <td><small>{{ request.comment or '-' }}</small></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted text-center mb-0">No revision requests</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="card border-0 shadow-sm">
+    <div class="card-body text-center py-5">
+        <i class="bi bi-person-x text-muted fs-1"></i>
+        <p class="text-muted mt-3">No child data available</p>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

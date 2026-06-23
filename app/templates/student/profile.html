@@ -1,0 +1,90 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}Profile - Student{% endblock %}
+
+{% block sidebar_items %}
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('student.dashboard') }}">
+        <i class="bi bi-speedometer2 me-2"></i>Dashboard
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('student.add_feedback') }}">
+        <i class="bi bi-plus-circle me-2"></i>Add Feedback
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('student.progress') }}">
+        <i class="bi bi-graph-up me-2"></i>My Progress
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('student.feedback_history') }}">
+        <i class="bi bi-clock-history me-2"></i>Feedback History
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link active" href="{{ url_for('student.profile') }}">
+        <i class="bi bi-person me-2"></i>Profile
+    </a>
+</li>
+{% endblock %}
+
+{% block page_title %}My Profile{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-xl-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center">
+                <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 100px; height: 100px;">
+                    <i class="bi bi-person-fill text-primary fs-1"></i>
+                </div>
+                <h5 class="mb-1">{{ student.user.full_name }}</h5>
+                <p class="text-muted mb-3">{{ student.user.username }}</p>
+                <span class="badge bg-primary">Student</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0 py-3">
+                <h6 class="mb-0 fw-bold">Profile Information</h6>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="text-muted small">Roll Number</label>
+                        <p class="fw-bold">{{ student.roll_number }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="text-muted small">Email</label>
+                        <p class="fw-bold">{{ student.user.email }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="text-muted small">Class</label>
+                        <p class="fw-bold">{{ class_info.name }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="text-muted small">Phone</label>
+                        <p class="fw-bold">{{ student.phone or '-' }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="text-muted small">Date of Birth</label>
+                        <p class="fw-bold">{{ student.date_of_birth.strftime('%Y-%m-%d') if student.date_of_birth else '-' }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="text-muted small">Admission Date</label>
+                        <p class="fw-bold">{{ student.admission_date.strftime('%Y-%m-%d') if student.admission_date else '-' }}</p>
+                    </div>
+                    <div class="col-12">
+                        <label class="text-muted small">Address</label>
+                        <p class="fw-bold">{{ student.address or '-' }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

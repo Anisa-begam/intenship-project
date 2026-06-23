@@ -1,0 +1,103 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}Add Feedback - Student{% endblock %}
+
+{% block sidebar_items %}
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('student.dashboard') }}">
+        <i class="bi bi-speedometer2 me-2"></i>Dashboard
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link active" href="{{ url_for('student.add_feedback') }}">
+        <i class="bi bi-plus-circle me-2"></i>Add Feedback
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('student.progress') }}">
+        <i class="bi bi-graph-up me-2"></i>My Progress
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('student.feedback_history') }}">
+        <i class="bi bi-clock-history me-2"></i>Feedback History
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('student.profile') }}">
+        <i class="bi bi-person me-2"></i>Profile
+    </a>
+</li>
+{% endblock %}
+
+{% block page_title %}Submit Feedback{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-xl-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0 py-3">
+                <h6 class="mb-0 fw-bold">Submit Your Feedback</h6>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('student.add_feedback') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="subject_id" class="form-label">Subject <span class="text-danger">*</span></label>
+                            <select class="form-select" id="subject_id" name="subject_id" required>
+                                <option value="">Select Subject</option>
+                                {% for subject in subjects %}
+                                <option value="{{ subject.id }}">{{ subject.name }} ({{ subject.code }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="topic" class="form-label">Topic <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="topic" name="topic" required placeholder="e.g., Functions in Python">
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="confidence_level" class="form-label">Confidence Level <span class="text-danger">*</span></label>
+                            <select class="form-select" id="confidence_level" name="confidence_level" required>
+                                <option value="">Select Level</option>
+                                <option value="High">High - I understand this well</option>
+                                <option value="Medium">Medium - I need some practice</option>
+                                <option value="Low">Low - I need help with this</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label">Need Revision?</label>
+                            <div class="form-check mt-2">
+                                <input class="form-check-input" type="checkbox" id="need_revision" name="need_revision">
+                                <label class="form-check-label" for="need_revision">
+                                    Yes, I would like this topic to be revised
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="col-12">
+                            <label for="comment" class="form-label">Comment</label>
+                            <textarea class="form-control" id="comment" name="comment" rows="3" placeholder="Any additional comments or questions..."></textarea>
+                        </div>
+                        
+                        <div class="col-12">
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-check-lg me-1"></i>Submit Feedback
+                                </button>
+                                <a href="{{ url_for('student.dashboard') }}" class="btn btn-outline-secondary">
+                                    <i class="bi bi-x-lg me-1"></i>Cancel
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

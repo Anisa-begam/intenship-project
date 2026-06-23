@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parent Dashboard - Campus Progress Tracker</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --secondary-color: #7c3aed;
+            --accent-color: #06b6d4;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --dark-bg: #0f172a;
+            --light-bg: #f8fafc;
+            --card-bg: #ffffff;
+            --sidebar-bg: #1e293b;
+            --text-dark: #1e293b;
+            --text-light: #64748b;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .sidebar {
+            background: var(--sidebar-bg);
+            min-height: 100vh;
+            padding: 20px;
+            color: white;
+            position: fixed;
+            width: 250px;
+            left: 0;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .sidebar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar-nav li {
+            margin-bottom: 10px;
+        }
+
+        .sidebar-nav a {
+            color: #94a3b8;
+            text-decoration: none;
+            padding: 12px 15px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-nav a:hover, .sidebar-nav a.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            padding: 30px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .stats-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .stats-card .icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .stats-card .icon.primary {
+            background: rgba(79, 70, 229, 0.1);
+            color: var(--primary-color);
+        }
+
+        .stats-card .icon.success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+        }
+
+        .stats-card .icon.warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning-color);
+        }
+
+        .stats-card .icon.danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger-color);
+        }
+
+        .stats-card h3 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+
+        .stats-card p {
+            color: var(--text-light);
+            margin: 0;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .card h5 {
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .learning-health-card {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+        }
+
+        .learning-health-card h3 {
+            font-size: 3rem;
+            font-weight: 700;
+        }
+
+        .health-excellent {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .health-good {
+            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+        }
+
+        .health-improvement {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+
+        .health-critical {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        .table thead th {
+            border-bottom: 2px solid #e2e8f0;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .badge {
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 70px;
+                padding: 15px 10px;
+            }
+            .sidebar-brand span, .sidebar-nav a span {
+                display: none;
+            }
+            .main-content {
+                margin-left: 70px;
+            }
+        }
+
+        .dark-mode {
+            background-color: var(--dark-bg);
+        }
+
+        .dark-mode .stats-card,
+        .dark-mode .card {
+            background: #1e293b;
+        }
+
+        .dark-mode .stats-card h3,
+        .dark-mode .card h5,
+        .dark-mode .table thead th {
+            color: white;
+        }
+
+        .dark-mode .table {
+            color: #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <i class="bi bi-graph-up-arrow"></i>
+            <span>Campus Tracker</span>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="#" class="active"><i class="bi bi-speedometer2"></i> <span>Dashboard</span></a></li>
+            <li><a href="#"><i class="bi bi-person"></i> <span>Child Profile</span></a></li>
+            <li><a href="#"><i class="bi bi-journal-text"></i> <span>Subject Progress</span></a></li>
+            <li><a href="#"><i class="bi bi-emoji-smile"></i> <span>Confidence Levels</span></a></li>
+            <li><a href="#"><i class="bi bi-chat-quote"></i> <span>Faculty Remarks</span></a></li>
+            <li><a href="#" onclick="logout()"><i class="bi bi-box-arrow-right"></i> <span>Logout</span></a></li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <div>
+                <h2>Parent Dashboard</h2>
+                <p class="text-muted">Monitor your child's academic progress</p>
+            </div>
+            <div class="d-flex gap-3 align-items-center">
+                <button class="btn btn-outline-secondary" onclick="toggleDarkMode()">
+                    <i class="bi bi-moon"></i>
+                </button>
+                <div class="dropdown">
+                    <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-person-circle"></i> <span id="parentName">Parent</span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">Profile</a></li>
+                        <li><a class="dropdown-item" href="#">Settings</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#" onclick="logout()">Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Learning Health Card -->
+        <div class="row g-4 mb-4">
+            <div class="col-lg-4">
+                <div class="card learning-health-card" id="learningHealthCard">
+                    <h5><i class="bi bi-heart-pulse"></i> Learning Health</h5>
+                    <h3 id="healthStatus">Loading...</h3>
+                    <p id="healthDescription">Analyzing your child's progress</p>
+                </div>
+            </div>
+            <div class="col-lg-8">
+                <div class="card">
+                    <h5><i class="bi bi-person"></i> Child Information</h5>
+                    <div id="childInfo">
+                        <p class="text-muted">Loading child information...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="row g-4 mb-4">
+            <div class="col-xl-3 col-md-6">
+                <div class="stats-card">
+                    <div class="icon primary">
+                        <i class="bi bi-percent"></i>
+                    </div>
+                    <h3 id="completionPercentage">0%</h3>
+                    <p>Syllabus Completion</p>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="stats-card">
+                    <div class="icon success">
+                        <i class="bi bi-emoji-smile"></i>
+                    </div>
+                    <h3 id="highConfidence">0</h3>
+                    <p>High Confidence Topics</p>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="stats-card">
+                    <div class="icon warning">
+                        <i class="bi bi-emoji-neutral"></i>
+                    </div>
+                    <h3 id="mediumConfidence">0</h3>
+                    <p>Medium Confidence Topics</p>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="stats-card">
+                    <div class="icon danger">
+                        <i class="bi bi-emoji-frown"></i>
+                    </div>
+                    <h3 id="lowConfidence">0</h3>
+                    <p>Low Confidence Topics</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Subject Progress and Confidence Chart -->
+        <div class="row g-4 mb-4">
+            <div class="col-lg-8">
+                <div class="card">
+                    <h5><i class="bi bi-journal-text"></i> Subject Progress</h5>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Subject</th>
+                                    <th>Topic</th>
+                                    <th>Faculty</th>
+                                    <th>Completion %</th>
+                                </tr>
+                            </thead>
+                            <tbody id="subjectProgressTable">
+                                <tr><td colspan="4" class="text-center">Loading...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card">
+                    <h5><i class="bi bi-pie-chart"></i> Confidence Distribution</h5>
+                    <canvas id="confidenceChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Faculty Remarks and Revision Suggestions -->
+        <div class="row g-4 mb-4">
+            <div class="col-lg-6">
+                <div class="card">
+                    <h5><i class="bi bi-chat-quote"></i> Faculty Remarks</h5>
+                    <div id="facultyRemarks">
+                        <p class="text-muted">Loading faculty remarks...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card">
+                    <h5><i class="bi bi-lightbulb"></i> Revision Suggestions</h5>
+                    <div id="revisionSuggestions">
+                        <p class="text-muted">Loading revision suggestions...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detailed Feedback -->
+        <div class="row g-4">
+            <div class="col-lg-12">
+                <div class="card">
+                    <h5><i class="bi bi-chat-dots"></i> Detailed Feedback History</h5>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Subject</th>
+                                    <th>Topic</th>
+                                    <th>Confidence Level</th>
+                                    <th>Remarks</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody id="feedbackTable">
+                                <tr><td colspan="5" class="text-center">Loading...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let confidenceChart;
+
+        // Load dashboard data
+        async function loadDashboard() {
+            const token = localStorage.getItem('access_token');
+            const user = JSON.parse(localStorage.getItem('user'));
+            
+            if (user) {
+                document.getElementById('parentName').textContent = user.name;
+            }
+            
+            try {
+                const response = await fetch('/api/parent/dashboard', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    updateDashboard(data);
+                } else {
+                    console.error('Failed to load dashboard data');
+                    alert('Failed to load dashboard data. Please ensure your account is linked to a student.');
+                }
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+            }
+        }
+
+        function updateDashboard(data) {
+            // Update child info
+            updateChildInfo(data.child_info);
+
+            // Update learning health
+            updateLearningHealth(data.learning_health);
+
+            // Update stats
+            document.getElementById('completionPercentage').textContent = data.learning_health.completion_percentage + '%';
+            document.getElementById('highConfidence').textContent = data.confidence_levels.high;
+            document.getElementById('mediumConfidence').textContent = data.confidence_levels.medium;
+            document.getElementById('lowConfidence').textContent = data.confidence_levels.low;
+
+            // Update subject progress
+            updateSubjectProgress(data.syllabus_progress);
+
+            // Update confidence chart
+            updateConfidenceChart(data.confidence_levels);
+
+            // Update faculty remarks
+            updateFacultyRemarks(data.faculty_remarks);
+
+            // Load revision suggestions
+            loadRevisionSuggestions();
+
+            // Load detailed feedback
+            loadDetailedFeedback();
+        }
+
+        function updateChildInfo(child) {
+            const container = document.getElementById('childInfo');
+            if (!child) {
+                container.innerHTML = '<p class="text-danger">No child information found</p>';
+                return;
+            }
+            
+            container.innerHTML = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Name:</strong> ${child.name}</p>
+                        <p><strong>Student ID:</strong> ${child.student_id || 'N/A'}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Department:</strong> ${child.department || 'N/A'}</p>
+                        <p><strong>Class:</strong> ${child.class || 'N/A'}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function updateLearningHealth(health) {
+            const card = document.getElementById('learningHealthCard');
+            const status = document.getElementById('healthStatus');
+            const description = document.getElementById('healthDescription');
+            
+            status.textContent = health.status;
+            
+            // Remove all health classes
+            card.classList.remove('health-excellent', 'health-good', 'health-improvement', 'health-critical');
+            
+            // Add appropriate class based on status
+            if (health.status === 'Excellent') {
+                card.classList.add('health-excellent');
+                description.textContent = `Your child is performing excellently with ${health.completion_percentage}% completion and ${health.confidence_ratio}% confidence ratio.`;
+            } else if (health.status === 'Good') {
+                card.classList.add('health-good');
+                description.textContent = `Your child is performing well with ${health.completion_percentage}% completion and ${health.confidence_ratio}% confidence ratio.`;
+            } else if (health.status === 'Needs Improvement') {
+                card.classList.add('health-improvement');
+                description.textContent = `Your child needs some improvement. Current completion: ${health.completion_percentage}%, Confidence ratio: ${health.confidence_ratio}%`;
+            } else {
+                card.classList.add('health-critical');
+                description.textContent = `Your child needs immediate attention. Current completion: ${health.completion_percentage}%, Confidence ratio: ${health.confidence_ratio}%`;
+            }
+        }
+
+        function updateSubjectProgress(progress) {
+            const tbody = document.getElementById('subjectProgressTable');
+            if (progress.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center">No progress data available</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = progress.slice(0, 10).map(p => `
+                <tr>
+                    <td>${p.subject}</td>
+                    <td>${p.topic}</td>
+                    <td>${p.faculty_name}</td>
+                    <td>
+                        <div class="progress" style="height: 20px;">
+                            <div class="progress-bar" role="progressbar" style="width: ${p.completion_percentage}%">
+                                ${p.completion_percentage}%
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function updateConfidenceChart(levels) {
+            const ctx = document.getElementById('confidenceChart').getContext('2d');
+            
+            if (confidenceChart) {
+                confidenceChart.destroy();
+            }
+
+            confidenceChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['High', 'Medium', 'Low'],
+                    datasets: [{
+                        data: [levels.high, levels.medium, levels.low],
+                        backgroundColor: [
+                            'rgba(16, 185, 129, 0.6)',
+                            'rgba(245, 158, 11, 0.6)',
+                            'rgba(239, 68, 68, 0.6)'
+                        ],
+                        borderColor: [
+                            'rgba(16, 185, 129, 1)',
+                            'rgba(245, 158, 11, 1)',
+                            'rgba(239, 68, 68, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateFacultyRemarks(remarks) {
+            const container = document.getElementById('facultyRemarks');
+            if (!remarks || remarks.length === 0) {
+                container.innerHTML = '<p class="text-muted">No faculty remarks available</p>';
+                return;
+            }
+            
+            container.innerHTML = remarks.slice(0, 5).map(r => `
+                <div class="alert alert-info mb-2">
+                    <strong>${r.subject}</strong>: ${r.remarks || 'No remarks'}
+                    <small class="d-block text-muted">by ${r.faculty_name}</small>
+                </div>
+            `).join('');
+        }
+
+        async function loadRevisionSuggestions() {
+            const token = localStorage.getItem('access_token');
+            
+            try {
+                const response = await fetch('/api/parent/revision-suggestions', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const suggestions = await response.json();
+                    updateRevisionSuggestions(suggestions);
+                }
+            } catch (error) {
+                console.error('Error loading revision suggestions:', error);
+            }
+        }
+
+        function updateRevisionSuggestions(suggestions) {
+            const container = document.getElementById('revisionSuggestions');
+            if (!suggestions || suggestions.length === 0) {
+                container.innerHTML = '<p class="text-success"><i class="bi bi-check-circle"></i> No revision suggestions needed</p>';
+                return;
+            }
+            
+            container.innerHTML = suggestions.slice(0, 5).map(s => `
+                <div class="alert alert-warning mb-2">
+                    <strong>${s.subject}</strong> - ${s.topic}
+                    <small class="d-block text-muted">Confidence: Low</small>
+                </div>
+            `).join('');
+        }
+
+        async function loadDetailedFeedback() {
+            const token = localStorage.getItem('access_token');
+            
+            try {
+                const response = await fetch('/api/parent/child-confidence', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    updateFeedbackTable(data.feedback);
+                }
+            } catch (error) {
+                console.error('Error loading feedback:', error);
+            }
+        }
+
+        function updateFeedbackTable(feedback) {
+            const tbody = document.getElementById('feedbackTable');
+            if (!feedback || feedback.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center">No feedback available</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = feedback.slice(0, 10).map(f => `
+                <tr>
+                    <td>${f.subject}</td>
+                    <td>${f.topic}</td>
+                    <td><span class="badge ${f.confidence_level === 'High' ? 'bg-success' : f.confidence_level === 'Medium' ? 'bg-warning' : 'bg-danger'}">${f.confidence_level}</span></td>
+                    <td>${f.remarks || '-'}</td>
+                    <td>${new Date(f.created_at).toLocaleDateString()}</td>
+                </tr>
+            `).join('');
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+        }
+
+        function logout() {
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('refresh_token');
+            localStorage.removeItem('user');
+            window.location.href = '/';
+        }
+
+        // Load dashboard on page load
+        document.addEventListener('DOMContentLoaded', loadDashboard);
+    </script>
+</body>
+</html>

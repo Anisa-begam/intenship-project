@@ -1,0 +1,93 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}My Progress - Student{% endblock %}
+
+{% block sidebar_items %}
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('student.dashboard') }}">
+        <i class="bi bi-speedometer2 me-2"></i>Dashboard
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('student.add_feedback') }}">
+        <i class="bi bi-plus-circle me-2"></i>Add Feedback
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link active" href="{{ url_for('student.progress') }}">
+        <i class="bi bi-graph-up me-2"></i>My Progress
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('student.feedback_history') }}">
+        <i class="bi bi-clock-history me-2"></i>Feedback History
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('student.profile') }}">
+        <i class="bi bi-person me-2"></i>Profile
+    </a>
+</li>
+{% endblock %}
+
+{% block page_title %}My Syllabus Progress{% endblock %}
+
+{% block content %}
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-white border-0 py-3">
+        <h6 class="mb-0 fw-bold">Detailed Syllabus Progress</h6>
+    </div>
+    <div class="card-body">
+        {% if progress_details %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Subject</th>
+                        <th>Unit</th>
+                        <th>Topic</th>
+                        <th>Completion</th>
+                        <th>Faculty Confidence</th>
+                        <th>Date</th>
+                        <th>Remarks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for detail in progress_details %}
+                    <tr>
+                        <td>{{ detail[0] }}</td>
+                        <td>{{ detail[1] }}</td>
+                        <td>{{ detail[2] }}</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="progress flex-grow-1 me-2" style="height: 8px;">
+                                    <div class="progress-bar bg-primary" style="width: {{ detail[3] }}%;"></div>
+                                </div>
+                                <small>{{ detail[3] }}%</small>
+                            </div>
+                        </td>
+                        <td>
+                            {% if detail[4] == 'High' %}
+                            <span class="badge bg-success">High</span>
+                            {% elif detail[4] == 'Medium' %}
+                            <span class="badge bg-warning">Medium</span>
+                            {% else %}
+                            <span class="badge bg-danger">Low</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ detail[5].strftime('%Y-%m-%d') }}</td>
+                        <td><small>{{ detail[6] or '-' }}</small></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-graph-down text-muted fs-1"></i>
+            <p class="text-muted mt-3">No progress data available yet</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

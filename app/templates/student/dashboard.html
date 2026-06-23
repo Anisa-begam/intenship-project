@@ -1,0 +1,238 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}Student Dashboard{% endblock %}
+
+{% block sidebar_items %}
+<li class="nav-item">
+    <a class="nav-link active" href="{{ url_for('student.dashboard') }}">
+        <i class="bi bi-speedometer2 me-2"></i>Dashboard
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('student.add_feedback') }}">
+        <i class="bi bi-plus-circle me-2"></i>Add Feedback
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('student.progress') }}">
+        <i class="bi bi-graph-up me-2"></i>My Progress
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('student.feedback_history') }}">
+        <i class="bi bi-clock-history me-2"></i>Feedback History
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('student.profile') }}">
+        <i class="bi bi-person me-2"></i>Profile
+    </a>
+</li>
+{% endblock %}
+
+{% block page_title %}Student Dashboard{% endblock %}
+
+{% block content %}
+<!-- Welcome Card -->
+<div class="card border-0 shadow-sm mb-4 bg-primary text-white">
+    <div class="card-body py-4">
+        <div class="d-flex align-items-center">
+            <div class="bg-white bg-opacity-25 rounded-circle d-flex align-items-center justify-content-center me-4" style="width: 80px; height: 80px;">
+                <i class="bi bi-person-fill fs-2"></i>
+            </div>
+            <div>
+                <h4 class="mb-1">Welcome, {{ student.user.full_name }}!</h4>
+                <p class="mb-0 opacity-75">{{ class_info.name }} | Roll No: {{ student.roll_number }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-xl-3 col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="bg-primary bg-opacity-10 rounded p-3 me-3">
+                        <i class="bi bi-percent text-primary fs-3"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-1">Overall Progress</h6>
+                        <h3 class="mb-0 fw-bold">{{ overall_progress }}%</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="bg-success bg-opacity-10 rounded p-3 me-3">
+                        <i class="bi bi-book text-success fs-3"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-1">Subjects</h6>
+                        <h3 class="mb-0 fw-bold">{{ subjects|length }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="bg-info bg-opacity-10 rounded p-3 me-3">
+                        <i class="bi bi-chat-dots text-info fs-3"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-1">Feedback Given</h6>
+                        <h3 class="mb-0 fw-bold">{{ feedback_history|length }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="bg-warning bg-opacity-10 rounded p-3 me-3">
+                        <i class="bi bi-arrow-repeat text-warning fs-3"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-1">Revision Needed</h6>
+                        <h3 class="mb-0 fw-bold">{{ feedback_history|selectattr('need_revision')|list|length }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Subject-wise Progress -->
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0 py-3">
+                <h6 class="mb-0 fw-bold">Subject-wise Progress</h6>
+            </div>
+            <div class="card-body">
+                {% if progress_data %}
+                <div class="row g-4">
+                    {% for name, completion in progress_data %}
+                    <div class="col-md-6">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="fw-bold">{{ name }}</span>
+                            <span class="text-muted">{{ completion|round(1) }}%</span>
+                        </div>
+                        <div class="progress" style="height: 25px;">
+                            <div class="progress-bar bg-primary" role="progressbar" style="width: {{ completion }}%;" aria-valuenow="{{ completion }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted text-center mb-0">No progress data available yet</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Faculty Remarks and Recent Feedback -->
+<div class="row g-4">
+    <div class="col-xl-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0 py-3">
+                <h6 class="mb-0 fw-bold">Recent Faculty Remarks</h6>
+            </div>
+            <div class="card-body">
+                {% if faculty_logs %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Subject</th>
+                                <th>Topic</th>
+                                <th>Remarks</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in faculty_logs %}
+                            <tr>
+                                <td>{{ log.date.strftime('%Y-%m-%d') }}</td>
+                                <td>{{ log.subject.name }}</td>
+                                <td><small>{{ log.topic }}</small></td>
+                                <td><small>{{ log.remarks or '-' }}</small></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted text-center mb-0">No faculty remarks yet</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0 py-3">
+                <h6 class="mb-0 fw-bold">Your Recent Feedback</h6>
+            </div>
+            <div class="card-body">
+                {% if feedback_history %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Subject</th>
+                                <th>Topic</th>
+                                <th>Confidence</th>
+                                <th>Revision</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for feedback in feedback_history %}
+                            <tr>
+                                <td>{{ feedback.date.strftime('%Y-%m-%d') }}</td>
+                                <td>{{ feedback.subject.name }}</td>
+                                <td><small>{{ feedback.topic }}</small></td>
+                                <td>
+                                    {% if feedback.confidence_level == 'High' %}
+                                    <span class="badge bg-success">High</span>
+                                    {% elif feedback.confidence_level == 'Medium' %}
+                                    <span class="badge bg-warning">Medium</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">Low</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if feedback.need_revision %}
+                                    <span class="badge bg-danger">Yes</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">No</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted text-center mb-0">No feedback submitted yet</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,118 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}Add Log - Faculty{% endblock %}
+
+{% block sidebar_items %}
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('faculty.dashboard') }}">
+        <i class="bi bi-speedometer2 me-2"></i>Dashboard
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link active" href="{{ url_for('faculty.add_log') }}">
+        <i class="bi bi-plus-circle me-2"></i>Add Log
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('faculty.logs') }}">
+        <i class="bi bi-journal-text me-2"></i>My Logs
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('faculty.feedback') }}">
+        <i class="bi bi-chat-dots me-2"></i>Student Feedback
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('faculty.profile') }}">
+        <i class="bi bi-person me-2"></i>Profile
+    </a>
+</li>
+{% endblock %}
+
+{% block page_title %}Add Syllabus Log{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-xl-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0 py-3">
+                <h6 class="mb-0 fw-bold">Daily Syllabus Log</h6>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('faculty.add_log') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="class_id" class="form-label">Class <span class="text-danger">*</span></label>
+                            <select class="form-select" id="class_id" name="class_id" required>
+                                <option value="">Select Class</option>
+                                {% for class_info in classes %}
+                                <option value="{{ class_info.id }}">{{ class_info.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="subject_id" class="form-label">Subject <span class="text-danger">*</span></label>
+                            <select class="form-select" id="subject_id" name="subject_id" required>
+                                <option value="">Select Subject</option>
+                                {% for subject in subjects %}
+                                <option value="{{ subject.id }}">{{ subject.name }} ({{ subject.code }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="unit" class="form-label">Unit <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="unit" name="unit" required placeholder="e.g., Unit 1">
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="topic" class="form-label">Topic <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="topic" name="topic" required placeholder="e.g., Introduction to Python">
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <label for="date" class="form-label">Date <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" id="date" name="date" required value="{{ today_date }}">
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <label for="completion_percentage" class="form-label">Completion % <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="completion_percentage" name="completion_percentage" min="0" max="100" required placeholder="0-100">
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <label for="confidence_level" class="form-label">Confidence Level <span class="text-danger">*</span></label>
+                            <select class="form-select" id="confidence_level" name="confidence_level" required>
+                                <option value="">Select Level</option>
+                                <option value="High">High</option>
+                                <option value="Medium">Medium</option>
+                                <option value="Low">Low</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-12">
+                            <label for="remarks" class="form-label">Remarks</label>
+                            <textarea class="form-control" id="remarks" name="remarks" rows="3" placeholder="Any additional notes or observations..."></textarea>
+                        </div>
+                        
+                        <div class="col-12">
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-check-lg me-1"></i>Submit Log
+                                </button>
+                                <a href="{{ url_for('faculty.dashboard') }}" class="btn btn-outline-secondary">
+                                    <i class="bi bi-x-lg me-1"></i>Cancel
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

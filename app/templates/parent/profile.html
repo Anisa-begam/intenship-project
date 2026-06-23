@@ -1,0 +1,102 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}Profile - Parent{% endblock %}
+
+{% block sidebar_items %}
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('parent.dashboard') }}">
+        <i class="bi bi-speedometer2 me-2"></i>Dashboard
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link active" href="{{ url_for('parent.profile') }}">
+        <i class="bi bi-person me-2"></i>Profile
+    </a>
+</li>
+{% endblock %}
+
+{% block page_title %}My Profile{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-xl-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center">
+                <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 100px; height: 100px;">
+                    <i class="bi bi-person-fill text-primary fs-1"></i>
+                </div>
+                <h5 class="mb-1">{{ parent.user.full_name }}</h5>
+                <p class="text-muted mb-3">{{ parent.user.username }}</p>
+                <span class="badge bg-primary">Parent</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-8">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white border-0 py-3">
+                <h6 class="mb-0 fw-bold">Profile Information</h6>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="text-muted small">Email</label>
+                        <p class="fw-bold">{{ parent.user.email }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="text-muted small">Phone</label>
+                        <p class="fw-bold">{{ parent.phone or '-' }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="text-muted small">Occupation</label>
+                        <p class="fw-bold">{{ parent.occupation or '-' }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0 py-3">
+                <h6 class="mb-0 fw-bold">Linked Children</h6>
+            </div>
+            <div class="card-body">
+                {% if children %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Roll Number</th>
+                                <th>Class</th>
+                                <th>Relationship</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for child in children %}
+                            <tr>
+                                <td>{{ child.student.user.full_name }}</td>
+                                <td>{{ child.student.roll_number }}</td>
+                                <td>{{ child.class_info.name if child.class_info else '-' }}</td>
+                                <td>{{ child.relationship }}</td>
+                                <td>
+                                    {% if child.is_primary %}
+                                    <span class="badge bg-primary">Primary</span>
+                                    {% endif %}
+                                    <a href="{{ url_for('parent.child_details', student_id=child.student.id) }}" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-eye"></i> View
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted text-center mb-0">No children linked to your account</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

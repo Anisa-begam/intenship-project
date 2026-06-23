@@ -1,0 +1,88 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}Subjects - Admin{% endblock %}
+
+{% block sidebar_items %}
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('admin.dashboard') }}">
+        <i class="bi bi-speedometer2 me-2"></i>Dashboard
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('admin.students') }}">
+        <i class="bi bi-people me-2"></i>Students
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('admin.faculty') }}">
+        <i class="bi bi-person-workspace me-2"></i>Faculty
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('admin.parents') }}">
+        <i class="bi bi-person-hearts me-2"></i>Parents
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('admin.classes') }}">
+        <i class="bi bi-building me-2"></i>Classes
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link active" href="{{ url_for('admin.subjects') }}">
+        <i class="bi bi-book me-2"></i>Subjects
+    </a>
+</li>
+{% endblock %}
+
+{% block page_title %}Subjects Management{% endblock %}
+
+{% block content %}
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-white border-0 py-3">
+        <div class="d-flex justify-content-between align-items-center">
+            <h6 class="mb-0 fw-bold">All Subjects</h6>
+            <button class="btn btn-primary btn-sm">
+                <i class="bi bi-plus-lg me-1"></i>Add Subject
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Name</th>
+                        <th>Class</th>
+                        <th>Total Units</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for subject in subjects_list %}
+                    <tr>
+                        <td><span class="badge bg-secondary">{{ subject.code }}</span></td>
+                        <td>{{ subject.name }}</td>
+                        <td>{{ subject.class_info.name }}</td>
+                        <td>{{ subject.total_units }}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary me-1">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center text-muted">No subjects found</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

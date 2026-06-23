@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Campus Progress Tracker</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --secondary-color: #7c3aed;
+            --accent-color: #06b6d4;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --dark-bg: #0f172a;
+            --light-bg: #f8fafc;
+            --card-bg: #ffffff;
+            --sidebar-bg: #1e293b;
+            --text-dark: #1e293b;
+            --text-light: #64748b;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .sidebar {
+            background: var(--sidebar-bg);
+            min-height: 100vh;
+            padding: 20px;
+            color: white;
+            position: fixed;
+            width: 250px;
+            left: 0;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .sidebar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar-nav li {
+            margin-bottom: 10px;
+        }
+
+        .sidebar-nav a {
+            color: #94a3b8;
+            text-decoration: none;
+            padding: 12px 15px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-nav a:hover, .sidebar-nav a.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            padding: 30px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .stats-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .stats-card .icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .stats-card .icon.primary {
+            background: rgba(79, 70, 229, 0.1);
+            color: var(--primary-color);
+        }
+
+        .stats-card .icon.success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+        }
+
+        .stats-card .icon.warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning-color);
+        }
+
+        .stats-card .icon.danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger-color);
+        }
+
+        .stats-card h3 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+
+        .stats-card p {
+            color: var(--text-light);
+            margin: 0;
+        }
+
+        .chart-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .chart-card h5 {
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .alert-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid var(--danger-color);
+        }
+
+        .table-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .table thead th {
+            border-bottom: 2px solid #e2e8f0;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .badge {
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            border: none;
+            border-radius: 10px;
+            padding: 10px 20px;
+            font-weight: 500;
+        }
+
+        .btn-primary:hover {
+            background: var(--secondary-color);
+        }
+
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 70px;
+                padding: 15px 10px;
+            }
+            .sidebar-brand span, .sidebar-nav a span {
+                display: none;
+            }
+            .main-content {
+                margin-left: 70px;
+            }
+        }
+
+        .dark-mode {
+            background-color: var(--dark-bg);
+        }
+
+        .dark-mode .stats-card,
+        .dark-mode .chart-card,
+        .dark-mode .table-card,
+        .dark-mode .alert-card {
+            background: #1e293b;
+        }
+
+        .dark-mode .stats-card h3,
+        .dark-mode .chart-card h5,
+        .dark-mode .table thead th {
+            color: white;
+        }
+
+        .dark-mode .table {
+            color: #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <i class="bi bi-graph-up-arrow"></i>
+            <span>Campus Tracker</span>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="#" class="active"><i class="bi bi-speedometer2"></i> <span>Dashboard</span></a></li>
+            <li><a href="#"><i class="bi bi-people"></i> <span>Users</span></a></li>
+            <li><a href="#"><i class="bi bi-book"></i> <span>Syllabus</span></a></li>
+            <li><a href="#"><i class="bi bi-graph-up"></i> <span>Analytics</span></a></li>
+            <li><a href="#"><i class="bi bi-bell"></i> <span>Notifications</span></a></li>
+            <li><a href="#" onclick="logout()"><i class="bi bi-box-arrow-right"></i> <span>Logout</span></a></li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <div>
+                <h2>Admin Dashboard</h2>
+                <p class="text-muted">Welcome back, Admin</p>
+            </div>
+            <div class="d-flex gap-3 align-items-center">
+                <button class="btn btn-outline-secondary" onclick="toggleDarkMode()">
+                    <i class="bi bi-moon"></i>
+                </button>
+                <div class="dropdown">
+                    <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-person-circle"></i> Admin
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">Profile</a></li>
+                        <li><a class="dropdown-item" href="#">Settings</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#" onclick="logout()">Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="row g-4 mb-4">
+            <div class="col-xl-3 col-md-6">
+                <div class="stats-card">
+                    <div class="icon primary">
+                        <i class="bi bi-people"></i>
+                    </div>
+                    <h3 id="totalStudents">0</h3>
+                    <p>Total Students</p>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="stats-card">
+                    <div class="icon success">
+                        <i class="bi bi-person-workspace"></i>
+                    </div>
+                    <h3 id="totalFaculty">0</h3>
+                    <p>Total Faculty</p>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="stats-card">
+                    <div class="icon warning">
+                        <i class="bi bi-people"></i>
+                    </div>
+                    <h3 id="totalParents">0</h3>
+                    <p>Total Parents</p>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="stats-card">
+                    <div class="icon danger">
+                        <i class="bi bi-exclamation-triangle"></i>
+                    </div>
+                    <h3 id="lowConfidenceAlerts">0</h3>
+                    <p>Low Confidence Alerts</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="row g-4 mb-4">
+            <div class="col-lg-6">
+                <div class="chart-card">
+                    <h5>Syllabus Completion by Subject</h5>
+                    <canvas id="completionChart"></canvas>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="chart-card">
+                    <h5>Student Confidence Distribution</h5>
+                    <canvas id="confidenceChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Faculty Status & Low Confidence Alerts -->
+        <div class="row g-4 mb-4">
+            <div class="col-lg-8">
+                <div class="table-card">
+                    <h5 class="mb-3">Faculty Update Status</h5>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Faculty Name</th>
+                                    <th>Last Update</th>
+                                    <th>Update Count</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="facultyStatusTable">
+                                <tr><td colspan="4" class="text-center">Loading...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="alert-card">
+                    <h5 class="mb-3"><i class="bi bi-exclamation-triangle text-danger"></i> Low Confidence Alerts</h5>
+                    <div id="lowConfidenceList">
+                        <p class="text-muted">Loading...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Subject & Class Performance -->
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="chart-card">
+                    <h5>Subject-wise Performance</h5>
+                    <canvas id="subjectPerformanceChart"></canvas>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="chart-card">
+                    <h5>Class-wise Performance</h5>
+                    <canvas id="classPerformanceChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let completionChart, confidenceChart, subjectPerformanceChart, classPerformanceChart;
+
+        // Load dashboard data
+        async function loadDashboard() {
+            const token = localStorage.getItem('access_token');
+            
+            try {
+                const response = await fetch('/api/admin/dashboard', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    updateDashboard(data);
+                } else {
+                    console.error('Failed to load dashboard data');
+                }
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+            }
+        }
+
+        function updateDashboard(data) {
+            // Update stats
+            document.getElementById('totalStudents').textContent = data.total_students;
+            document.getElementById('totalFaculty').textContent = data.total_faculty;
+            document.getElementById('totalParents').textContent = data.total_parents;
+            document.getElementById('lowConfidenceAlerts').textContent = data.low_confidence_alerts;
+
+            // Update completion chart
+            updateCompletionChart(data.completion_stats);
+
+            // Update confidence chart
+            updateConfidenceChart(data.confidence_stats);
+
+            // Update faculty status table
+            updateFacultyStatus(data.faculty_updates);
+
+            // Update low confidence alerts
+            updateLowConfidenceAlerts(data.low_confidence_alerts);
+
+            // Update performance charts
+            updateSubjectPerformance(data.subject_performance);
+            updateClassPerformance(data.class_performance);
+        }
+
+        function updateCompletionChart(stats) {
+            const ctx = document.getElementById('completionChart').getContext('2d');
+            
+            if (completionChart) {
+                completionChart.destroy();
+            }
+
+            const labels = stats.map(s => s._id);
+            const data = stats.map(s => s.avg_completion.toFixed(1));
+
+            completionChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Average Completion %',
+                        data: data,
+                        backgroundColor: 'rgba(79, 70, 229, 0.6)',
+                        borderColor: 'rgba(79, 70, 229, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateConfidenceChart(stats) {
+            const ctx = document.getElementById('confidenceChart').getContext('2d');
+            
+            if (confidenceChart) {
+                confidenceChart.destroy();
+            }
+
+            const labels = stats.map(s => s._id || 'Unknown');
+            const data = stats.map(s => s.count);
+
+            confidenceChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: [
+                            'rgba(16, 185, 129, 0.6)',
+                            'rgba(245, 158, 11, 0.6)',
+                            'rgba(239, 68, 68, 0.6)'
+                        ],
+                        borderColor: [
+                            'rgba(16, 185, 129, 1)',
+                            'rgba(245, 158, 11, 1)',
+                            'rgba(239, 68, 68, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true
+                }
+            });
+        }
+
+        function updateFacultyStatus(faculty) {
+            const tbody = document.getElementById('facultyStatusTable');
+            tbody.innerHTML = faculty.map(f => `
+                <tr>
+                    <td>${f.faculty_name}</td>
+                    <td>${f.last_update ? new Date(f.last_update).toLocaleDateString() : 'Never'}</td>
+                    <td>${f.update_count}</td>
+                    <td><span class="badge bg-success">Active</span></td>
+                </tr>
+            `).join('');
+        }
+
+        function updateLowConfidenceAlerts(count) {
+            const container = document.getElementById('lowConfidenceList');
+            if (count > 0) {
+                container.innerHTML = `
+                    <div class="alert alert-danger mb-2">
+                        <i class="bi bi-exclamation-circle"></i> ${count} students have low confidence
+                    </div>
+                    <button class="btn btn-sm btn-outline-danger">View Details</button>
+                `;
+            } else {
+                container.innerHTML = '<p class="text-success"><i class="bi bi-check-circle"></i> No low confidence alerts</p>';
+            }
+        }
+
+        function updateSubjectPerformance(performance) {
+            const ctx = document.getElementById('subjectPerformanceChart').getContext('2d');
+            
+            if (subjectPerformanceChart) {
+                subjectPerformanceChart.destroy();
+            }
+
+            const labels = performance.map(p => p._id);
+            const data = performance.map(p => p.avg_completion.toFixed(1));
+
+            subjectPerformanceChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Average Completion %',
+                        data: data,
+                        borderColor: 'rgba(6, 182, 212, 1)',
+                        backgroundColor: 'rgba(6, 182, 212, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateClassPerformance(performance) {
+            const ctx = document.getElementById('classPerformanceChart').getContext('2d');
+            
+            if (classPerformanceChart) {
+                classPerformanceChart.destroy();
+            }
+
+            const labels = performance.map(p => p._id);
+            const data = performance.map(p => p.avg_completion.toFixed(1));
+
+            classPerformanceChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Average Completion %',
+                        data: data,
+                        backgroundColor: 'rgba(124, 58, 237, 0.6)',
+                        borderColor: 'rgba(124, 58, 237, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+        }
+
+        function logout() {
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('refresh_token');
+            localStorage.removeItem('user');
+            window.location.href = '/';
+        }
+
+        // Load dashboard on page load
+        document.addEventListener('DOMContentLoaded', loadDashboard);
+    </script>
+</body>
+</html>

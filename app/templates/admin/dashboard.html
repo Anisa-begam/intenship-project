@@ -1,0 +1,440 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block sidebar_items %}
+<li class="nav-item">
+    <a class="nav-link active" href="{{ url_for('admin.dashboard') }}">
+        <i class="bi bi-speedometer2 me-2"></i>Dashboard
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('admin.students') }}">
+        <i class="bi bi-people me-2"></i>Students
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('admin.faculty') }}">
+        <i class="bi bi-person-workspace me-2"></i>Faculty
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('admin.parents') }}">
+        <i class="bi bi-person-hearts me-2"></i>Parents
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('admin.classes') }}">
+        <i class="bi bi-building me-2"></i>Classes
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('admin.subjects') }}">
+        <i class="bi bi-book me-2"></i>Subjects
+    </a>
+</li>
+{% endblock %}
+
+{% block page_title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<!-- Quick Actions -->
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex flex-wrap gap-2 align-items-center">
+                    <h6 class="mb-0 me-3 fw-bold"><i class="bi bi-lightning-charge-fill text-warning me-2"></i>Quick Actions</h6>
+                    <a href="{{ url_for('admin.export_data', data_type='students') }}" class="btn btn-sm btn-primary">
+                        <i class="bi bi-download me-1"></i>Export Students
+                    </a>
+                    <a href="{{ url_for('admin.export_data', data_type='faculty') }}" class="btn btn-sm btn-success">
+                        <i class="bi bi-download me-1"></i>Export Faculty
+                    </a>
+                    <a href="{{ url_for('admin.export_data', data_type='faculty_logs') }}" class="btn btn-sm btn-info">
+                        <i class="bi bi-download me-1"></i>Export Logs
+                    </a>
+                    <a href="{{ url_for('admin.export_data', data_type='student_feedback') }}" class="btn btn-sm btn-warning">
+                        <i class="bi bi-download me-1"></i>Export Feedback
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-xl-3 col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="bg-primary bg-opacity-10 rounded p-3 me-3">
+                        <i class="bi bi-people-fill text-primary fs-3"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-1">Total Students</h6>
+                        <h3 class="mb-0 fw-bold">{{ total_students }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="bg-success bg-opacity-10 rounded p-3 me-3">
+                        <i class="bi bi-person-workspace text-success fs-3"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-1">Total Faculty</h6>
+                        <h3 class="mb-0 fw-bold">{{ total_faculty }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="bg-info bg-opacity-10 rounded p-3 me-3">
+                        <i class="bi bi-building text-info fs-3"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-1">Total Classes</h6>
+                        <h3 class="mb-0 fw-bold">{{ total_classes }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="bg-warning bg-opacity-10 rounded p-3 me-3">
+                        <i class="bi bi-book text-warning fs-3"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-1">Total Subjects</h6>
+                        <h3 class="mb-0 fw-bold">{{ total_subjects }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Overall Progress and Charts -->
+<div class="row g-4 mb-4">
+    <div class="col-xl-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0 py-3">
+                <h6 class="mb-0 fw-bold">Overall Syllabus Completion</h6>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-3">
+                    <div class="display-4 fw-bold text-primary">{{ avg_completion }}%</div>
+                    <p class="text-muted mb-0">Average Progress</p>
+                </div>
+                <div class="progress" style="height: 20px;">
+                    <div class="progress-bar bg-primary" role="progressbar" style="width: {{ avg_completion }}%;" aria-valuenow="{{ avg_completion }}" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0 py-3">
+                <h6 class="mb-0 fw-bold">Confidence Distribution</h6>
+            </div>
+            <div class="card-body">
+                <canvas id="confidenceChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0 py-3">
+                <h6 class="mb-0 fw-bold">Subject-wise Completion</h6>
+            </div>
+            <div class="card-body">
+                <canvas id="subjectChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Low Confidence Alerts and Revision Requests -->
+<div class="row g-4 mb-4">
+    <div class="col-xl-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0 py-3">
+                <h6 class="mb-0 fw-bold"><i class="bi bi-exclamation-triangle-fill text-danger me-2"></i>Low Confidence Alerts</h6>
+            </div>
+            <div class="card-body">
+                {% if low_confidence_logs %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Subject</th>
+                                <th>Topic</th>
+                                <th>Date</th>
+                                <th>Remarks</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in low_confidence_logs %}
+                            <tr>
+                                <td>{{ log.subject.name }}</td>
+                                <td>{{ log.topic }}</td>
+                                <td>{{ log.date.strftime('%Y-%m-%d') }}</td>
+                                <td><small>{{ log.remarks or '-' }}</small></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted text-center mb-0">No low confidence alerts</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0 py-3">
+                <h6 class="mb-0 fw-bold"><i class="bi bi-arrow-repeat text-warning me-2"></i>Revision Requests</h6>
+            </div>
+            <div class="card-body">
+                {% if revision_requests %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Subject</th>
+                                <th>Topic</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for request in revision_requests %}
+                            <tr>
+                                <td>{{ request.student.user.full_name }}</td>
+                                <td>{{ request.subject.name }}</td>
+                                <td>{{ request.topic }}</td>
+                                <td>{{ request.date.strftime('%Y-%m-%d') }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted text-center mb-0">No revision requests</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Faculty Activity and Parent Visibility -->
+<div class="row g-4">
+    <div class="col-xl-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0 py-3">
+                <h6 class="mb-0 fw-bold">Faculty Activity</h6>
+            </div>
+            <div class="card-body">
+                {% if faculty_activity %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Faculty Name</th>
+                                <th>Logs Submitted</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for faculty_name, count in faculty_activity %}
+                            <tr>
+                                <td>{{ faculty_name }}</td>
+                                <td><span class="badge bg-primary">{{ count }}</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted text-center mb-0">No faculty activity data</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0 py-3">
+                <h6 class="mb-0 fw-bold">Parent Visibility Summary</h6>
+            </div>
+            <div class="card-body">
+                <div class="text-center">
+                    <div class="display-4 fw-bold text-info">{{ parent_visibility }}</div>
+                    <p class="text-muted mb-0">Active Parent-Student Mappings</p>
+                </div>
+                <div class="mt-3">
+                    <div class="d-flex justify-content-between text-muted small">
+                        <span>Total Parents: {{ total_parents }}</span>
+                        <span>Connected: {{ parent_visibility }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Confidence Distribution Chart
+const confidenceCtx = document.getElementById('confidenceChart').getContext('2d');
+new Chart(confidenceCtx, {
+    type: 'doughnut',
+    data: {
+        labels: ['High', 'Medium', 'Low'],
+        datasets: [{
+            data: [{{ confidence_dict.get('High', 0) }}, {{ confidence_dict.get('Medium', 0) }}, {{ confidence_dict.get('Low', 0) }}],
+            backgroundColor: [
+                'rgba(79, 172, 254, 0.8)',
+                'rgba(250, 112, 154, 0.8)',
+                'rgba(245, 87, 108, 0.8)'
+            ],
+            borderColor: [
+                'rgba(79, 172, 254, 1)',
+                'rgba(250, 112, 154, 1)',
+                'rgba(245, 87, 108, 1)'
+            ],
+            borderWidth: 2,
+            hoverOffset: 10
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '65%',
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: {
+                    padding: 20,
+                    usePointStyle: true,
+                    font: {
+                        size: 12,
+                        weight: '500'
+                    }
+                }
+            },
+            tooltip: {
+                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                padding: 12,
+                cornerRadius: 8,
+                callbacks: {
+                    label: function(context) {
+                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                        const percentage = ((context.parsed / total) * 100).toFixed(1);
+                        return `${context.label}: ${context.parsed} (${percentage}%)`;
+                    }
+                }
+            }
+        },
+        animation: {
+            animateRotate: true,
+            animateScale: true
+        }
+    }
+});
+
+// Subject-wise Completion Chart
+const subjectCtx = document.getElementById('subjectChart').getContext('2d');
+const subjectGradient = subjectCtx.createLinearGradient(0, 0, 0, 400);
+subjectGradient.addColorStop(0, 'rgba(102, 126, 234, 0.8)');
+subjectGradient.addColorStop(1, 'rgba(118, 75, 162, 0.8)');
+
+new Chart(subjectCtx, {
+    type: 'bar',
+    data: {
+        labels: [{% for name, value in subject_completion %}'{{ name }}'{% if not loop.last %},{% endif %}{% endfor %}],
+        datasets: [{
+            label: 'Completion %',
+            data: [{% for name, value in subject_completion %}{{ value }}{% if not loop.last %},{% endif %}{% endfor %}],
+            backgroundColor: subjectGradient,
+            borderColor: 'rgba(102, 126, 234, 1)',
+            borderWidth: 2,
+            borderRadius: 8,
+            borderSkipped: false,
+            hoverBackgroundColor: 'rgba(102, 126, 234, 1)'
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true,
+                max: 100,
+                grid: {
+                    color: 'rgba(0, 0, 0, 0.05)',
+                    drawBorder: false
+                },
+                ticks: {
+                    callback: function(value) {
+                        return value + '%';
+                    },
+                    font: {
+                        weight: '500'
+                    }
+                }
+            },
+            x: {
+                grid: {
+                    display: false
+                },
+                ticks: {
+                    font: {
+                        weight: '500'
+                    }
+                }
+            }
+        },
+        plugins: {
+            legend: {
+                display: false
+            },
+            tooltip: {
+                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                padding: 12,
+                cornerRadius: 8,
+                callbacks: {
+                    label: function(context) {
+                        return `Completion: ${context.parsed.y}%`;
+                    }
+                }
+            }
+        },
+        animation: {
+            duration: 1000,
+            easing: 'easeOutQuart'
+        }
+    }
+});
+</script>
+{% endblock %}
